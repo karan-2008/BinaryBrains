@@ -6,6 +6,7 @@ import VillagesPanel from '../components/VillagesPanel';
 import OverviewPanel from '../components/OverviewPanel';
 import ReportsPanel from '../components/ReportsPanel';
 import MapViewPanel from '../components/MapViewPanel';
+import WeatherPanel from '../components/WeatherPanel';
 
 function AdminDashboard() {
     // ------------------------------------------------------------------------
@@ -91,6 +92,8 @@ function AdminDashboard() {
                 );
             case 'reports':
                 return <ReportsPanel villages={villages} />;
+            case 'weather':
+                return <WeatherPanel villages={villages} />;
             case 'map':
                 return <MapViewPanel villages={villages} loading={loadingVillages} />;
             default:

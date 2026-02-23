@@ -57,8 +57,8 @@ async def get_villages_status():
     results = []
     for v in villages:
         # ---- Live Weather Integration ----
-        lat = v.get("latitude", 0.0)
-        lon = v.get("longitude", 0.0)
+        lat = v.get("lat", 0.0)
+        lon = v.get("lng", 0.0)
         weather = fetch_weather(village_id=v["id"], lat=lat, lon=lon)
 
         # Compute rainfall deviation from live data
@@ -138,4 +138,26 @@ async def get_village_insight(
         "village_name": village["name"],
         "language": lang,
         "insight": insight,
+    }
+
+
+@router.get("/{village_id}/forecast")
+async def get_village_forecast(village_id: str):
+    """
+    Fetch 5-day weather forecast for a specific village.
+    """
+    from app.services.weather_service import fetch_forecast
+    
+    village = get_village_by_id(village_id)
+    if not village:
+        raise HTTPException(status_code=404, detail="Village not found")
+
+    lat = village.get("lat", 0.0)
+    lon = village.get("lng", 0.0)
+    
+    forecast = fetch_forecast(village_id=village_id, lat=lat, lon=lon)
+    return {
+        "village_id": village_id,
+        "village_name": village["name"],
+        "forecast": forecast
     }

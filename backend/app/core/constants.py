@@ -30,6 +30,7 @@ OLLAMA_MODEL = "deepseek-v3.1:671b-cloud"
 # OpenWeather API Configuration
 # ---------------------------------------------------------------------------
 OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
+OPENWEATHER_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
 WEATHER_CACHE_TTL_SECONDS = 900  # 15 minutes
 
 # ---------------------------------------------------------------------------

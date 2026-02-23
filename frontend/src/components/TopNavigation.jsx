@@ -34,6 +34,10 @@ export default function TopNavigation({ activeTab, setActiveTab }) {
                             onClick={() => setActiveTab('map')}
                             className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'map' ? 'bg-white dark:bg-slate-700 text-primary shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
                         >Map View</button>
+                        <button
+                            onClick={() => setActiveTab('weather')}
+                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'weather' ? 'bg-white dark:bg-slate-700 text-primary shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                        >Weather</button>
                     </nav>
 
                     {/* Right Actions */}

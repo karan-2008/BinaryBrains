@@ -117,6 +117,93 @@ def fetch_weather(village_id: str, lat: float, lon: float) -> dict:
         return _default_weather()
 
 
+def fetch_forecast(village_id: str, lat: float, lon: float) -> list:
+    """
+    Fetch 5-day / 3-hour forecast for the given coordinates from OpenWeather API,
+    and aggregate it into a daily forecast.
+
+    Returns a list of daily dictionaries:
+        [{
+            "date": "2026-02-23",
+            "temp_min": float,
+            "temp_max": float,
+            "rainfall_mm": float,
+            "humidity_avg": float
+        }, ...]
+    """
+    cache_key = f"{village_id}_forecast"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        return cached
+
+    api_key = settings.OPENWEATHER_API_KEY
+    if not api_key:
+        return []
+
+    params = {
+        "lat": lat,
+        "lon": lon,
+        "appid": api_key,
+        "units": "metric",
+    }
+
+    try:
+        from app.core.constants import OPENWEATHER_FORECAST_URL
+        response = requests.get(OPENWEATHER_FORECAST_URL, params=params, timeout=5)
+
+        if response.status_code != 200:
+            logger.error("Forecast API error %d for %s", response.status_code, village_id)
+            return []
+
+        data = response.json()
+        daily_forecast = {}
+
+        # Aggregate 3-hour chunks into daily
+        for item in data.get("list", []):
+            dt_txt = item.get("dt_txt", "")
+            if not dt_txt:
+                continue
+            
+            date_str = dt_txt.split(" ")[0]  # YYYY-MM-DD
+            
+            main = item.get("main", {})
+            rain = item.get("rain", {}).get("3h", 0.0)
+
+            if date_str not in daily_forecast:
+                daily_forecast[date_str] = {
+                    "date": date_str,
+                    "temp_min": main.get("temp_min", 999),
+                    "temp_max": main.get("temp_max", -999),
+                    "rainfall_mm": 0.0,
+                    "humidity_sum": 0.0,
+                    "count": 0
+                }
+            
+            day = daily_forecast[date_str]
+            day["temp_min"] = min(day["temp_min"], main.get("temp_min", 999))
+            day["temp_max"] = max(day["temp_max"], main.get("temp_max", -999))
+            day["rainfall_mm"] += rain
+            day["humidity_sum"] += main.get("humidity", 0)
+            day["count"] += 1
+
+        # Format output
+        result = []
+        for d in sorted(daily_forecast.values(), key=lambda x: x["date"]):
+            d["humidity_avg"] = round(d["humidity_sum"] / d["count"], 1) if d["count"] > 0 else 0
+            d["rainfall_mm"] = round(d["rainfall_mm"], 2)
+            d["temp_min"] = round(d["temp_min"], 1)
+            d["temp_max"] = round(d["temp_max"], 1)
+            del d["humidity_sum"]
+            del d["count"]
+            result.append(d)
+
+        _set_cache(cache_key, result)
+        return result
+
+    except Exception as exc:
+        logger.error("Forecast API request failed for village %s: %s", village_id, exc)
+        return []
+
 # ---------------------------------------------------------------------------
 # Internal Helpers
 # ---------------------------------------------------------------------------
