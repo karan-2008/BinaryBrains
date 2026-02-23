@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Village Water Stress Severity Grid</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"],
+                        "mono": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"],
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<div class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+<div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<!-- Logo & Title -->
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<div class="hidden md:flex flex-col">
+<h1 class="text-lg font-bold leading-none text-slate-900 dark:text-white">Water Management Dashboard</h1>
+<span class="text-xs text-slate-500 font-medium mt-1">Government Monitoring Portal</span>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+<a class="px-4 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 rounded-md transition-colors" href="#">Overview</a>
+<a class="px-4 py-1.5 text-sm font-medium bg-white dark:bg-slate-700 text-primary shadow-sm rounded-md transition-colors" href="#">Villages</a>
+<a class="px-4 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 rounded-md transition-colors" href="#">Reports</a>
+<a class="px-4 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 rounded-md transition-colors" href="#">Map View</a>
+</nav>
+<!-- Right Actions -->
+<div class="flex items-center gap-4">
+<button class="text-slate-500 hover:text-slate-700 relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border border-white dark:border-slate-900"></span>
+</button>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button class="flex items-center gap-2 group">
+<div class="size-9 rounded-full bg-slate-200 overflow-hidden border border-slate-300">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Portrait of a user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoxvS11AO4TE0H8R-sNH2-Exuf9WhfwLEfr1jhu6jHgo9tI2195o2hTVb3pKuvUQQiaEtO9wJKlOXhVE9Fe_7TuJ__TAdzbjdRkZt6O5954XPsuCfhkWIIFRb7Sz_GXTSD2tIcYXK83bDZklpZxg4bRCqgzZbsa4TxbPm-cIL-RjBvM_xqMMArGnvEo-9JyTKSlc-cLkmRAL9fKnN_64P9542mJPyA0uuiTuYQQVE98re2rheMD4JaUJeD9eacw_OIETsPtPb-xtc"/>
+</div>
+<span class="hidden lg:block text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-slate-900">Admin User</span>
+<span class="material-symbols-outlined text-slate-400 text-[20px]">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-1 bg-slate-50/50 dark:bg-background-dark py-8 px-4 sm:px-6 lg:px-8">
+<div class="max-w-[1200px] mx-auto space-y-6">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Village Water Stress Severity Grid</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-2 text-base">Monitor real-time drought levels, water supply index (WSI), and tanker dispatch requirements.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition shadow-sm">
+<span class="material-symbols-outlined text-[20px]">file_download</span>
+                        Export CSV
+                    </button>
+<button class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition shadow-sm shadow-blue-200 dark:shadow-none">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                        Add Village
+                    </button>
+</div>
+</div>
+<!-- Stats Overview Cards (Optional context) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">Total Villages</div>
+<div class="text-2xl font-bold text-slate-900 dark:text-white">1,248</div>
+</div>
+<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-900/30 shadow-sm">
+<div class="text-red-600 dark:text-red-400 text-xs font-semibold uppercase tracking-wider mb-1">Critical Status</div>
+<div class="text-2xl font-bold text-red-700 dark:text-red-400">85</div>
+</div>
+<div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-xl border border-yellow-100 dark:border-yellow-900/30 shadow-sm">
+<div class="text-yellow-600 dark:text-yellow-400 text-xs font-semibold uppercase tracking-wider mb-1">Warning Status</div>
+<div class="text-2xl font-bold text-yellow-700 dark:text-yellow-400">312</div>
+</div>
+<div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-xl border border-green-100 dark:border-green-900/30 shadow-sm">
+<div class="text-green-600 dark:text-green-400 text-xs font-semibold uppercase tracking-wider mb-1">Safe Status</div>
+<div class="text-2xl font-bold text-green-700 dark:text-green-400">851</div>
+</div>
+</div>
+<!-- Filters & Search -->
+<div class="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center gap-2 w-full sm:w-auto p-1">
+<div class="relative w-full sm:w-80 group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 text-[20px]">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2 border-none ring-1 ring-slate-200 dark:ring-slate-700 rounded-lg leading-5 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm transition-shadow" placeholder="Search village, district or region..." type="text"/>
+</div>
+</div>
+<div class="flex gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 px-2 sm:px-0">
+<button class="whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">All Regions</button>
+<button class="whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 transition">North Zone</button>
+<button class="whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 transition">East Zone</button>
+<button class="whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 transition">South Zone</button>
+<button class="whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 transition flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">filter_list</span> Filter
+                    </button>
+</div>
+</div>
+<!-- Main Data Table Card -->
+<div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+<thead class="bg-slate-50 dark:bg-slate-700/50">
+<tr>
+<th class="sticky left-0 z-10 bg-slate-50 dark:bg-slate-800 px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] md:shadow-none" scope="col">
+                                    Village Name
+                                </th>
+<th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" scope="col">
+                                    District
+                                </th>
+<th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" scope="col">
+                                    Drought Severity (WSI)
+                                </th>
+<th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" scope="col">
+                                    Population
+                                </th>
+<th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" scope="col">
+                                    Tanker Requirement
+                                </th>
+<th class="px-6 py-4 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" scope="col">
+                                    Action
+                                </th>
+</tr>
+</thead>
+<tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+<!-- Row 1: Critical -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+<td class="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-700/50 px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] md:shadow-none">
+                                    Rampur District A
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+                                    North West Region
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-100 dark:border-red-900/50">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+</span>
+                                        CRITICAL • 85
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">
+                                    1,240
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300 font-mono font-medium">
+                                    04 Units
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 hover:text-primary transition shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+                                        Analyze
+                                    </button>
+</td>
+</tr>
+<!-- Row 2: Warning -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+<td class="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-700/50 px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] md:shadow-none">
+                                    Kishanpur South
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+                                    Central Valley
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-900/50">
+<span class="h-2 w-2 rounded-full bg-yellow-600"></span>
+                                        WARNING • 55
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">
+                                    890
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300 font-mono font-medium">
+                                    02 Units
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 hover:text-primary transition shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+                                        Analyze
+                                    </button>
+</td>
+</tr>
+<!-- Row 3: Safe -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+<td class="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-700/50 px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] md:shadow-none">
+                                    Lakhanpur West
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+                                    Eastern Plains
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-100 dark:border-green-900/50">
+<span class="h-2 w-2 rounded-full bg-green-600"></span>
+                                        SAFE • 22
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">
+                                    2,105
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300 font-mono font-medium">
+                                    00 Units
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 hover:text-primary transition shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+                                        Analyze
+                                    </button>
+</td>
+</tr>
+<!-- Row 4: Critical -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+<td class="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-700/50 px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] md:shadow-none">
+                                    Madhopur East
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+                                    Upper Highlands
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-100 dark:border-red-900/50">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+</span>
+                                        CRITICAL • 92
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">
+                                    540
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300 font-mono font-medium">
+                                    08 Units
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 hover:text-primary transition shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+                                        Analyze
+                                    </button>
+</td>
+</tr>
+<!-- Row 5: Warning -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+<td class="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-700/50 px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] md:shadow-none">
+                                    Sonpur North
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+                                    Coastal Belt
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-900/50">
+<span class="h-2 w-2 rounded-full bg-yellow-600"></span>
+                                        WARNING • 48
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">
+                                    1,670
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300 font-mono font-medium">
+                                    01 Units
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 hover:text-primary transition shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+                                        Analyze
+                                    </button>
+</td>
+</tr>
+<!-- Row 6: Safe -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+<td class="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-700/50 px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] md:shadow-none">
+                                    Bhimpur Central
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+                                    North West Region
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-100 dark:border-green-900/50">
+<span class="h-2 w-2 rounded-full bg-green-600"></span>
+                                        SAFE • 15
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">
+                                    920
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300 font-mono font-medium">
+                                    00 Units
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 hover:text-primary transition shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+                                        Analyze
+                                    </button>
+</td>
+</tr>
+<!-- Row 7: Warning -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+<td class="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-700/50 px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] md:shadow-none">
+                                    Sitapur Plains
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+                                    Eastern Plains
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-900/50">
+<span class="h-2 w-2 rounded-full bg-yellow-600"></span>
+                                        WARNING • 61
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">
+                                    3,100
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300 font-mono font-medium">
+                                    03 Units
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 hover:text-primary transition shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+                                        Analyze
+                                    </button>
+</td>
+</tr>
+<!-- Row 8: Safe -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+<td class="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-700/50 px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] md:shadow-none">
+                                    Barhampur Valley
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+                                    Central Valley
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-100 dark:border-green-900/50">
+<span class="h-2 w-2 rounded-full bg-green-600"></span>
+                                        SAFE • 28
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">
+                                    1,050
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300 font-mono font-medium">
+                                    00 Units
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 hover:text-primary transition shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+                                        Analyze
+                                    </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="bg-white dark:bg-slate-800 px-6 py-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+<div class="flex-1 flex justify-between sm:hidden">
+<a class="relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50" href="#">Previous</a>
+<a class="ml-3 relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50" href="#">Next</a>
+</div>
+<div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-slate-500 dark:text-slate-400">
+                                Showing <span class="font-medium">1</span> to <span class="font-medium">8</span> of <span class="font-medium">1,248</span> results
+                            </p>
+</div>
+<div>
+<nav aria-label="Pagination" class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+<a class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-600" href="#">
+<span class="sr-only">Previous</span>
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</a>
+<a aria-current="page" class="z-10 bg-slate-50 dark:bg-slate-600 border-primary text-primary relative inline-flex items-center px-4 py-2 border text-sm font-bold" href="#">1</a>
+<a class="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#">2</a>
+<a class="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-600 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium" href="#">3</a>
+<span class="relative inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-400">...</span>
+<a class="bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-600 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium" href="#">8</a>
+<a class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-600" href="#">
+<span class="sr-only">Next</span>
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

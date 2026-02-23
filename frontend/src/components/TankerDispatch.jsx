@@ -1,88 +1,66 @@
-/**
- * TankerDispatch Component
- *
- * Fetches and displays the tanker allocation plan.
- * Shows village-to-tanker assignments with deficit and priority info.
- */
+import React from 'react';
 
-import { useState, useEffect } from "react";
-import { fetchTankerAllocation } from "../api/backendClient";
-
-function TankerDispatch() {
-    const [allocation, setAllocation] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-
-    const loadAllocation = async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            const data = await fetchTankerAllocation();
-            setAllocation(data);
-        } catch (err) {
-            setError(
-                err.response?.data?.detail || "Failed to fetch tanker allocation."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadAllocation();
-    }, []);
+export default function TankerDispatch({ allocationData, refreshStatus }) {
+    const { data, loading, error, onRefresh } = allocationData;
 
     return (
-        <div className="tanker-dispatch">
-            <div className="dispatch-header">
-                <h3>Tanker Allocation Plan</h3>
-                <button className="btn-refresh" onClick={loadAllocation} disabled={loading}>
-                    {loading ? "Loading..." : "Refresh"}
+        <div className="mt-8 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">Live Tanker Allocation Plan</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        Automated dispatch logic based on critical WSI thresholds
+                    </p>
+                </div>
+                <button
+                    onClick={onRefresh}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-semibold transition disabled:opacity-50"
+                >
+                    <span className={`material-symbols-outlined text-[18px] ${loading ? 'animate-spin' : ''}`}>sync</span>
+                    {refreshStatus}
                 </button>
             </div>
 
-            {error && <div className="dispatch-error">{error}</div>}
-
-            {allocation && (
-                <>
-                    <div className="dispatch-summary">
-                        <span>Villages in Need: <strong>{allocation.total_villages_in_need}</strong></span>
-                        <span>Tankers Assigned: <strong>{allocation.total_tankers_assigned}</strong></span>
+            <div className="p-6">
+                {error ? (
+                    <div className="p-4 rounded-xl bg-red-50 text-red-700 border border-red-200 flex gap-3">
+                        <span className="material-symbols-outlined">error</span>
+                        <p className="text-sm font-medium">{error}</p>
                     </div>
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Village</th>
-                                <th>Deficit (L)</th>
-                                <th>Allocated (L)</th>
-                                <th>Tanker ID</th>
-                                <th>Priority</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {allocation.allocations.map((a, idx) => (
-                                <tr key={idx}>
-                                    <td>{a.village_name}</td>
-                                    <td>{a.deficit_liters.toLocaleString()}</td>
-                                    <td>{a.allocated_liters.toLocaleString()}</td>
-                                    <td>{a.tanker_id}</td>
-                                    <td>{a.priority_score.toFixed(1)}</td>
+                ) : !data || data.allocations.length === 0 ? (
+                    <div className="text-center py-12 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
+                        <span className="material-symbols-outlined text-4xl text-green-500 mb-2">check_circle</span>
+                        <h4 className="text-slate-900 dark:text-white font-medium">No Tankers Required</h4>
+                        <p className="text-sm text-slate-500 mt-1">All villages are operating below the critical Water Stress Index threshold (&gt;70).</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                            <thead className="bg-slate-50 dark:bg-slate-700/50">
+                                <tr>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Priority</th>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Village</th>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Water Deficit (L)</th>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Tanker ID</th>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Capacity (L)</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-
-                    {allocation.allocations.length === 0 && (
-                        <p className="empty-state">
-                            No allocations needed — all villages within safe WSI range.
-                        </p>
-                    )}
-                </>
-            )}
+                            </thead>
+                            <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+                                {data.allocations.map((alloc, idx) => (
+                                    <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-slate-900 dark:text-white">#{idx + 1}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white">{alloc.village_name}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-red-600 dark:text-red-400 font-mono font-medium">{alloc.water_deficit.toLocaleString()}L</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500 font-mono bg-amber-50 dark:bg-amber-900/20 px-2 rounded">{alloc.assigned_tanker}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300 font-mono">{alloc.tanker_capacity.toLocaleString()}L</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
-
-export default TankerDispatch;
