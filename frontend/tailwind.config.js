@@ -10,13 +10,17 @@ export default {
             colors: {
                 "primary": "#137fec",
                 "background-light": "#f6f7f8",
-                "background-dark": "#101922",
             },
             fontFamily: {
                 "display": ["Public Sans", "sans-serif"],
                 "mono": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"],
             },
-            borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+            borderRadius: {
+                "DEFAULT": "0.5rem",
+                "lg": "1rem",
+                "xl": "1.5rem",
+                "full": "9999px"
+            },
         },
     },
     plugins: [

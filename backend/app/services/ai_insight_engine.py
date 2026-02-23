@@ -110,3 +110,27 @@ Output Language: {target_language}
     except requests.exceptions.RequestException as e:
         logger.error(f"Ollama Request Error: {e}")
         return f"Error: {str(e)}"
+
+def query_ollama(prompt: str, timeout_sec: int = 120) -> str:
+    """
+    Generic wrapper to query the local Ollama instance.
+    """
+    try:
+        response = requests.post(
+            OLLAMA_URL,
+            json={
+                "model": MODEL_NAME,
+                "prompt": prompt,
+                "stream": False
+            },
+            headers={"Authorization": f"Bearer {OLLAMA_API_KEY}"} if OLLAMA_API_KEY else {},
+            timeout=timeout_sec
+        )
+        response.raise_for_status()
+        
+        raw_text = response.json().get("response", "")
+        return sanitize_ai_response(raw_text)
+        
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Ollama API Error: {e}")
+        return f"Error: Failed to connect to AI Insight Engine ({e})"
