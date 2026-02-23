@@ -16,6 +16,7 @@ class Settings:
 
     SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
     SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
+    OPENWEATHER_API_KEY: str = os.getenv("OPENWEATHER_API_KEY", "")
 
     def validate(self) -> None:
         """Raise an error if required settings are missing."""

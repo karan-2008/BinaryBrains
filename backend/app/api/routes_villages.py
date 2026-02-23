@@ -1,21 +1,35 @@
 """
-Village API routes — Phase 4 (Live DB).
+Village API routes — Phase 4 (Live DB + Live Weather).
 
 Endpoints:
-    GET /api/villages/status                — Fetch all villages from Supabase with computed WSI
+    GET /api/villages/status                — Fetch all villages with live weather + computed WSI
     GET /api/villages/{village_id}/insight   — Generate AI advisory for a specific village
 """
 
 from fastapi import APIRouter, HTTPException, Query
 
 from app.database.queries import get_all_villages_with_groundwater, get_village_by_id
-from app.services.wsi_calculator import compute_wsi, compute_priority_score
+from app.services.wsi_calculator import compute_wsi, compute_priority_score, calculate_rainfall_deviation
 from app.services.ai_insight_engine import generate_drought_insight
+from app.services.weather_service import fetch_weather
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/villages", tags=["Villages"])
+
+# ---------------------------------------------------------------------------
+# Expected monthly rainfall (mm/hr equivalent) per village.
+# TODO: Replace with historical averages from a database table.
+# ---------------------------------------------------------------------------
+EXPECTED_RAINFALL_MM = {
+    "V001": 2.5,   # Ramtek
+    "V002": 2.0,   # Saoner
+    "V003": 1.8,   # Katol
+    "V004": 2.2,   # Hingna
+    "V005": 1.5,   # Umred
+}
+DEFAULT_EXPECTED_RAINFALL = 2.0
 
 
 def _wsi_status_label(wsi: float) -> str:
@@ -30,17 +44,39 @@ def _wsi_status_label(wsi: float) -> str:
 @router.get("/status")
 async def get_villages_status():
     """
-    Fetch all villages from Supabase, compute WSI and priority for each,
-    and return sorted by priority (highest first).
+    Fetch all villages from Supabase, enrich with live weather data from
+    OpenWeather, compute WSI and priority for each, and return sorted by
+    priority (highest first).
+
+    Weather data is cached in-memory for 15 minutes per village.
+    If the weather API is unavailable, the system falls back to the
+    database-stored rainfall_dev_pct value.
     """
     villages = get_all_villages_with_groundwater()
 
     results = []
     for v in villages:
+        # ---- Live Weather Integration ----
+        lat = v.get("latitude", 0.0)
+        lon = v.get("longitude", 0.0)
+        weather = fetch_weather(village_id=v["id"], lat=lat, lon=lon)
+
+        # Compute rainfall deviation from live data
+        actual_rain = weather["rainfall_mm_last_hour"]
+        expected_rain = EXPECTED_RAINFALL_MM.get(v["id"], DEFAULT_EXPECTED_RAINFALL)
+
+        if actual_rain > 0 or weather["humidity_percent"] > 0:
+            # Live weather available — use it to compute deviation
+            rainfall_dev_pct = -calculate_rainfall_deviation(actual_rain, expected_rain)
+            # Negative = deficit (consistent with existing WSI formula)
+        else:
+            # Fallback to stored value from database
+            rainfall_dev_pct = v["rainfall_dev_pct"]
+
         wsi = compute_wsi(
             gw_current_level=v["gw_current_level"],
             gw_min_required=v["gw_min_required"],
-            rainfall_dev_pct=v["rainfall_dev_pct"],
+            rainfall_dev_pct=rainfall_dev_pct,
         )
         priority = compute_priority_score(population=v["population"], wsi=wsi)
 
@@ -48,6 +84,12 @@ async def get_villages_status():
             **v,
             "wsi": round(wsi, 2),
             "priority_score": round(priority, 2),
+            "rainfall_dev_pct": round(rainfall_dev_pct, 2),
+            "live_weather": {
+                "rainfall_mm": weather["rainfall_mm_last_hour"],
+                "humidity": weather["humidity_percent"],
+                "temp_c": weather["temperature_celsius"],
+            },
         })
 
     results.sort(key=lambda r: r["priority_score"], reverse=True)

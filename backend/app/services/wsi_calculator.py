@@ -69,3 +69,26 @@ def compute_priority_score(population: int, wsi: float) -> float:
         A non-negative priority score.
     """
     return (population / 1000.0) * wsi
+
+
+def calculate_rainfall_deviation(actual_rainfall: float, expected_rainfall: float) -> float:
+    """
+    Deterministic rainfall deviation calculation.
+
+    Computes how far below the expected rainfall the actual rainfall is,
+    expressed as a percentage (0–100). A higher value indicates a larger
+    deficit (more drought stress).
+
+    Args:
+        actual_rainfall: Actual observed rainfall in mm.
+        expected_rainfall: Expected/normal rainfall in mm for this period.
+
+    Returns:
+        Deviation percentage clamped between 0 and 100.
+        0 = no deficit, 100 = total drought (zero rainfall vs expectation).
+    """
+    if expected_rainfall <= 0:
+        return 0.0
+
+    deviation = ((expected_rainfall - actual_rainfall) / expected_rainfall) * 100.0
+    return max(0.0, min(deviation, 100.0))

@@ -27,6 +27,12 @@ OLLAMA_GENERATE_ENDPOINT = f"{OLLAMA_BASE_URL}/api/generate"
 OLLAMA_MODEL = "deepseek-v3.1:671b-cloud"
 
 # ---------------------------------------------------------------------------
+# OpenWeather API Configuration
+# ---------------------------------------------------------------------------
+OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
+WEATHER_CACHE_TTL_SECONDS = 900  # 15 minutes
+
+# ---------------------------------------------------------------------------
 # API Configuration
 # ---------------------------------------------------------------------------
 API_PREFIX = "/api"
