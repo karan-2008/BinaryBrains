@@ -1,0 +1,6 @@
+tanker_id,capacity_liters,status
+T001,10000,Available
+T002,10000,Available
+T003,15000,Dispatched
+T004,10000,Maintenance
+T005,20000,Available
