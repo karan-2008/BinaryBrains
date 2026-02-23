@@ -61,17 +61,24 @@ async def get_villages_status():
         lon = v.get("lng", 0.0)
         weather = fetch_weather(village_id=v["id"], lat=lat, lon=lon)
 
-        # Compute rainfall deviation from live data
+        # Retrieve the seasonal cumulative deviation from the database
+        base_dev_pct = v.get("rainfall_dev_pct", 0.0)
+        
         actual_rain = weather["rainfall_mm_last_hour"]
-        expected_rain = EXPECTED_RAINFALL_MM.get(v["id"], DEFAULT_EXPECTED_RAINFALL)
 
-        if actual_rain > 0 or weather["humidity_percent"] > 0:
-            # Live weather available — use it to compute deviation
-            rainfall_dev_pct = -calculate_rainfall_deviation(actual_rain, expected_rain)
-            # Negative = deficit (consistent with existing WSI formula)
+        if weather["humidity_percent"] > 0:
+            if actual_rain > 0:
+                # When actual rain happens, it relieves the existing drought deficit.
+                # Example: If deficit is -15%, and it rains 2mm, we improve deviation.
+                # Using a factor of +5% deviation improvement per mm of rain.
+                rainfall_dev_pct = min(100.0, base_dev_pct + (actual_rain * 5.0))
+            else:
+                # If it's not currently raining, reverting to hourly expectation produces 
+                # an unrealistic -100% deficit. We instead stick to the realistic seasonal base.
+                rainfall_dev_pct = base_dev_pct
         else:
-            # Fallback to stored value from database
-            rainfall_dev_pct = v["rainfall_dev_pct"]
+            # Weather API failed completely, fallback to DB
+            rainfall_dev_pct = base_dev_pct
 
         wsi = compute_wsi(
             gw_current_level=v["gw_current_level"],
