@@ -9,7 +9,7 @@ import axios from "axios";
 
 const backendClient = axios.create({
   baseURL: "http://localhost:8000",
-  timeout: 30000, // 30s timeout (AI insight calls may be slow)
+  timeout: 120000, // 120s timeout — the 671B AI model can take up to 2 minutes
   headers: {
     "Content-Type": "application/json",
   },

@@ -24,7 +24,7 @@ MIN_WATER_REQUIREMENT_LPCD = 40           # Liters per capita per day (LPCD)
 # ---------------------------------------------------------------------------
 OLLAMA_BASE_URL = "http://localhost:11434"
 OLLAMA_GENERATE_ENDPOINT = f"{OLLAMA_BASE_URL}/api/generate"
-OLLAMA_MODEL = "deepseek-v3.1671b-cloud"
+OLLAMA_MODEL = "deepseek-v3.1:671b-cloud"
 
 # ---------------------------------------------------------------------------
 # API Configuration

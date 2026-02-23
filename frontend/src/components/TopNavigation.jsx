@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function TopNavigation() {
+export default function TopNavigation({ activeTab, setActiveTab }) {
     return (
         <div className="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -18,10 +18,22 @@ export default function TopNavigation() {
 
                     {/* Nav Links */}
                     <nav className="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-                        <a className="px-4 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 rounded-md transition-colors" href="#">Overview</a>
-                        <a className="px-4 py-1.5 text-sm font-medium bg-white dark:bg-slate-700 text-primary shadow-sm rounded-md transition-colors" href="#">Villages</a>
-                        <a className="px-4 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 rounded-md transition-colors" href="#">Reports</a>
-                        <a className="px-4 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 rounded-md transition-colors" href="#">Map View</a>
+                        <button
+                            onClick={() => setActiveTab('overview')}
+                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'overview' ? 'bg-white dark:bg-slate-700 text-primary shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                        >Overview</button>
+                        <button
+                            onClick={() => setActiveTab('villages')}
+                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'villages' ? 'bg-white dark:bg-slate-700 text-primary shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                        >Villages</button>
+                        <button
+                            onClick={() => setActiveTab('reports')}
+                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'reports' ? 'bg-white dark:bg-slate-700 text-primary shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                        >Reports</button>
+                        <button
+                            onClick={() => setActiveTab('map')}
+                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'map' ? 'bg-white dark:bg-slate-700 text-primary shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                        >Map View</button>
                     </nav>
 
                     {/* Right Actions */}

@@ -88,8 +88,8 @@ async def get_village_insight(
         target_language=lang,
     )
 
-    if "Error" in insight:
-        raise HTTPException(status_code=503, detail="AI Service Unavailable")
+    if insight.startswith("Error:"):
+        raise HTTPException(status_code=503, detail=insight)
 
     return {
         "village_id": village["id"],

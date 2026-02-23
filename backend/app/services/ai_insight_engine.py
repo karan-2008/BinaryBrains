@@ -22,7 +22,7 @@ logger = get_logger(__name__)
 # ---------------------------------------------------------------------------
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
 OLLAMA_API_KEY = os.getenv("OLLAMA_API_KEY", "")
-MODEL_NAME = os.getenv("OLLAMA_MODEL", "deepseek-v3.1671b-cloud")
+MODEL_NAME = os.getenv("OLLAMA_MODEL", "deepseek-v3.1:671b-cloud")
 
 
 def generate_drought_insight(
@@ -52,26 +52,25 @@ def generate_drought_insight(
         Cleaned advisory text with exactly 3 bullet points,
         or an error message string if the LLM call fails.
     """
-    prompt = f"""
-    You are an expert Hydrologist AI assisting the District Collector.
-    Analyze the following deterministic village data and provide a strict 3-bullet point action plan.
-    DO NOT perform any calculations. Use the provided data.
+    prompt = f"""You are an expert Hydrologist AI assisting the District Collector.
+Analyze the following deterministic village data and provide a strict 3-bullet point action plan.
+DO NOT perform any calculations. Use the provided data. Do NOT include any <think> tags or reasoning blocks.
 
-    Data Context:
-    - Village: {village_name}
-    - Population: {population}
-    - Water Stress Index (WSI): {wsi}/100 (Status: {status})
-    - Rainfall Deviation: {r_dev}%
-    - Groundwater Drop: {g_drop}m
-    - Tankers Allocated: {tankers}
+Data Context:
+- Village: {village_name}
+- Population: {population}
+- Water Stress Index (WSI): {wsi}/100 (Status: {status})
+- Rainfall Deviation: {r_dev}%
+- Groundwater Drop: {g_drop}m
+- Tankers Allocated: {tankers}
 
-    Output Format MUST be exactly 3 bullet points:
-    1. Primary Cause: [One sentence explaining why the WSI is high based on the data]
-    2. Impact: [One sentence on population risk]
-    3. Directive: [One sentence on immediate administrative action]
+Output Format MUST be exactly 3 numbered bullet points:
+1. Primary Cause: [One sentence explaining why the WSI is at this level based on the data]
+2. Impact: [One sentence on population risk]
+3. Directive: [One sentence on immediate administrative action]
 
-    Output Language: {target_language}
-    """
+Output Language: {target_language}
+"""
 
     payload = {
         "model": MODEL_NAME,
@@ -86,11 +85,15 @@ def generate_drought_insight(
     logger.info(f"Requesting AI insight for village: {village_name} (lang={target_language}, model={MODEL_NAME})")
 
     try:
-        response = requests.post(OLLAMA_URL, json=payload, headers=headers, timeout=45)
+        response = requests.post(OLLAMA_URL, json=payload, headers=headers, timeout=120)
         response.raise_for_status()
 
         response_data = response.json()
         raw_output = response_data.get("response", "")
+
+        if not raw_output.strip():
+            logger.warning(f"Ollama returned empty response for {village_name}")
+            return "Error: Ollama returned an empty response. The model may still be loading."
 
         # Sanitize the output before returning
         clean_output = sanitize_ai_response(raw_output)
@@ -98,6 +101,12 @@ def generate_drought_insight(
         logger.info(f"AI insight generated for {village_name}: {len(clean_output)} chars")
         return clean_output
 
+    except requests.exceptions.Timeout:
+        logger.error(f"Ollama timed out for {village_name} (120s)")
+        return "Error: AI model timed out. The 671B model may need more time. Please retry."
+    except requests.exceptions.ConnectionError:
+        logger.error("Cannot connect to Ollama. Is it running?")
+        return "Error: Cannot connect to Ollama at " + OLLAMA_URL + ". Ensure Ollama is running."
     except requests.exceptions.RequestException as e:
-        logger.error(f"Ollama Connection Error: {e}")
-        return "Error: Unable to generate AI insight. Ensure Ollama is running locally with the correct model."
+        logger.error(f"Ollama Request Error: {e}")
+        return f"Error: {str(e)}"
